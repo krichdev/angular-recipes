@@ -29,6 +29,16 @@
   <body>
     <div class="container">
       <div ng-include="'app/views/navbar.html'"></div>
+      <div ng-controller="AlertsCtrl">
+        <div ng-repeat="a in alerts">
+          <div class="alert alert-danger" ng-if="a.type == 'error'">
+            {{ a.msg }}
+          </div>
+          <div class="alert alert-success" ng-if="a.type == 'success'">
+            {{ a.msg }}
+          </div>
+        </div>
+      </div>
       <div ui-view></div>
     </div>
   </body>

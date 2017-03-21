@@ -40,26 +40,47 @@ angular.module('RecipeCtrls', ['RecipeServices'])
     });
   };
 }])
-.controller('NavCtrl', ['$scope', function($scope) {
+.controller('NavCtrl', ['$scope', "Auth", "Alerts", "$state", function($scope, Auth, $state, Alerts) {
+  $scope.isLoggedIn = function(){
+    return Auth.isLoggedIn();
+  };
   $scope.logout = function() {
-    // to implement
+    Auth.removeToken();
+    Alerts.add("success", "You are now logged out");
   };
 }])
-.controller('SignupCtrl', ['$scope', function($scope) {
+.controller('SignupCtrl', ['$scope', '$http', "$state", function($scope, $http, $state) {
   $scope.user = {
     email: '',
     password: ''
   };
   $scope.userSignup = function() {
-    // to implement
+    $http.post("/api/users", $scope.user).then(function success(res){
+      console.log("successful sign up");
+      console.log(res);
+      $state.go("home");
+    }, function error(err){
+      console.log("error:", err)
+    })
   };
 }])
-.controller('LoginCtrl', ['$scope', function($scope) {
+.controller('LoginCtrl', ['$scope', "$http", "$state", "Auth", "Alerts", function($scope, $http, $state, Auth, Alerts) {
   $scope.user = {
     email: '',
     password: ''
   };
   $scope.userLogin = function() {
-    // to implement
+    $http.post("/api/auth", $scope.user).then(function success(res){
+      Auth.saveToken(res.data.token);
+      Alerts.add("success", "You are now logged in as " + res.data.user.email)
+      $state.go("home")
+    }, function error(res){
+      console.log("Login error", res)
+      Alerts.add("error", "Bad login info")
+    });
   };
-}]);
+}])
+.controller('AlertsCtrl', ["$scope", "Alerts", function($scope, Alerts){
+  $scope.alerts = Alerts.get();
+
+}])
